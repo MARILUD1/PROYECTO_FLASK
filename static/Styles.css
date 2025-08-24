@@ -1,0 +1,155 @@
+body {
+    background-color: #1094d1; /* Un azul clarito de ejemplo */
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: rgb(247, 49, 49);
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(1, 1, 1, 0.1);
+}
+
+h3 {
+    background-color: rgb(236, 149, 153); /* Este color no se verá si el texto es oscuro. Considera cambiar el color del texto a blanco si lo mantienes. */
+    color: rgb(1, 15, 1); /* Añadido para que el texto sea visible */
+    padding: 5px; /* Pequeño padding para h3 dentro de las tarjetas */
+    border-radius: 5px 5px 0 0; /* Bordes redondeados en la parte superior */
+}
+
+/* Estilos responsivos para móviles */
+@media (max-width: 576px) {
+  body {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+ .container {
+  max-width: 100%;
+  padding: 20px;
+}
+}
+
+.image-container {
+    width: 150px; /* Ancho fijo del contenedor */
+    height: 100px; /* Alto fijo del contenedor */
+    overflow: hidden; /* Asegura que la imagen no se salga del contenedor */
+    margin: 5px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Ajusta el minmax para incluir el contenedor */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.gallery-image {
+    width: 100%; /* La imagen ocupa el ancho de su contenedor */
+    height: 100%; /* La imagen ocupa la altura de su contenedor */
+    object-fit: cover;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 5px;
+}
+
+.gallery-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); /* Sombra azul al pasar el ratón */
+}
+
+.gallery-image.selected {
+    border: 3px solid #007bff; /* Borde azul vibrante cuando está seleccionada */
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.8); /* Sombra más pronunciada cuando está seleccionada */
+}
+body {
+    background-color: #8db5dd;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #e9d8d8;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+input.valid {
+    border: 2px solid #000a02;
+}
+
+input.invalid {
+    border: 2px solid #dc3545;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 0.9rem;
+    margin-top: -8px;
+    margin-bottom: 10px;
+}
+
+button {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#submitBtn {
+    background-color: #007bff;
+    color: rgb(86, 34, 230);
+}
+
+#submitBtn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+#resetBtn {
+    background-color: #250f76;
+    color: rgb(220, 44, 44);
+}
+#productList li {
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    padding: 10px;
+}
+#miCarrusel .carousel-item img {
+  height: 1OOpx; /* Puedes ajustar este valor */
+  object-fit: contain;
+}
+
+/* Opcional: limitar el ancho del carrusel y centrarlo */
+#miCarrusel {
+  max-width: 150px;
+  margin: 0 auto;
+}
+
+/* Estilo adicional para el mensaje de reacción */
+#mensajeReaccion {
+  font-weight: bold;
+  color: green;
+}

@@ -1,155 +1,271 @@
+:root {
+  --bg: #e4fa9b;
+  --fg: #090a01;
+  --muted: #94a3b8;
+  --brand: #fafafa;
+  --ok: #16a34a;
+  --warn: #f59e0b;
+  --danger: #dc2626;
+  --card: #7b0aec;
+  --accent: #5bdef2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Estilos principales de la página*/
 body {
-    background-color: #1094d1; /* Un azul clarito de ejemplo */
-    margin: 0;
-    font-family: Arial, sans-serif;
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
 }
 
-h1 {
-    color: rgb(247, 49, 49);
+.site-header {
+  background: var(--bg);
+  border-bottom: 1px solid rgb(1, 1, 23);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.card {
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(1, 1, 1, 0.1);
+.nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 11rem 1.2rem;
+  max-width: 960px;
+  margin: 3 auto;
 }
 
-h3 {
-    background-color: rgb(236, 149, 153); /* Este color no se verá si el texto es oscuro. Considera cambiar el color del texto a blanco si lo mantienes. */
-    color: rgb(1, 15, 1); /* Añadido para que el texto sea visible */
-    padding: 5px; /* Pequeño padding para h3 dentro de las tarjetas */
-    border-radius: 5px 5px 0 0; /* Bordes redondeados en la parte superior */
+.nav a {
+  color: var(--fg);
+  text-decoration: none;
+  opacity: 0.9;
+  font-weight: 600;
 }
 
-/* Estilos responsivos para móviles */
-@media (max-width: 576px) {
-  body {
-    padding: 10px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-
- .container {
-  max-width: 100%;
-  padding: 20px;
-}
-}
-
-.image-container {
-    width: 150px; /* Ancho fijo del contenedor */
-    height: 100px; /* Alto fijo del contenedor */
-    overflow: hidden; /* Asegura que la imagen no se salga del contenedor */
-    margin: 5px;
-}
-
-.gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Ajusta el minmax para incluir el contenedor */
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.gallery-image {
-    width: 100%; /* La imagen ocupa el ancho de su contenedor */
-    height: 100%; /* La imagen ocupa la altura de su contenedor */
-    object-fit: cover;
-    border: 3px solid transparent;
-    cursor: pointer;
-    transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
-    border-radius: 5px;
-}
-
-.gallery-image:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); /* Sombra azul al pasar el ratón */
-}
-
-.gallery-image.selected {
-    border: 3px solid #007bff; /* Borde azul vibrante cuando está seleccionada */
-    box-shadow: 0 0 20px rgba(0, 123, 255, 0.8); /* Sombra más pronunciada cuando está seleccionada */
-}
-body {
-    background-color: #8db5dd;
-    font-family: Arial, sans-serif;
-    padding: 20px;
+.nav a:hover {
+  opacity: 1;
+  text-decoration: underline;
 }
 
 .container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: #e9d8d8;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
+/* Estilos para la tabla*/
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: var(--card);
+  border: 1px solid #223;
 }
 
-input, button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-size: 1rem;
+.table th, .table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgb(193, 233, 16);
+  text-align: left;
 }
 
-input.valid {
-    border: 2px solid #000a02;
+.table th {
+  color: #d2f09e;
+  font-weight: 600;
+  background: #e71ab7;
 }
 
-input.invalid {
-    border: 2px solid #dc3545;
+/* Estilos para formularios*/
+.form-inline {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0 1rem;
 }
 
-.error {
-    color: #dc3545;
-    font-size: 0.9rem;
-    margin-top: -8px;
-    margin-bottom: 10px;
+.input, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  background: #eb96e3;
+  color: var(--fg);
+  border: 1px solid rgb(81, 188, 211);
+  border-radius: 0.5rem;
 }
 
-button {
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-#submitBtn {
-    background-color: #007bff;
-    color: rgb(86, 34, 230);
-}
-
-#submitBtn:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-}
-
-#resetBtn {
-    background-color: #250f76;
-    color: rgb(220, 44, 44);
-}
-#productList li {
-    background-color: #f9f9f9;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    padding: 10px;
-}
-#miCarrusel .carousel-item img {
-  height: 1OOpx; /* Puedes ajustar este valor */
-  object-fit: contain;
-}
-
-/* Opcional: limitar el ancho del carrusel y centrarlo */
-#miCarrusel {
-  max-width: 150px;
+.form-card {
+  max-width: 520px;
+  background: var(--card);
+  padding: 1rem;
+  border: 1px solid rgb(157, 157, 252);
+  border-radius: 0.8rem;
   margin: 0 auto;
 }
 
-/* Estilo adicional para el mensaje de reacción */
-#mensajeReaccion {
+.form-group {
+  margin-bottom: 0.9rem;
+}
+
+.error {
+  color: #fca5a5;
+  display: block;
+  margin-top: 0.25rem;
+}
+/* Estilos para los botones*/
+.btn {
+  display: inline-block;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(115, 115, 234);
+  background: #7d7ff6;
+  color: 
+  rgb(241, 152, 210);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: filter 0.2s;
+  text-align: center;
+}
+
+.btn:hover {
+  filter: brightness(1.1);
+}
+
+.btn-primary {
+  background:purple;
+  border-color: black;
+}
+
+.btn-secondary {
+  background: #f27b13;
+  border-color: #080808;
+}
+
+.btn-danger {
+  background:green;
+  border-color: black;
+}
+
+.btn-small {
+  padding: 0.35rem 0.55rem;
+  font-size: 0.9rem;
+}
+
+/* Mensajes flash*/
+.flash-container {
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.flash {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(20, 211, 160);
+  background: #5dbff0;
+}
+
+.flash.success {
+  border-color: #14532d;
+  background: #052e18;
+}
+
+.flash.info {
+  border-color: #0e2a52;
+  background: #f5a8ea;
+}
+
+.flash.warning {
+  border-color: #513c0b;
+  background: #f6ac3c;
+}
+
+
+.site-footer {
+  text-align: center;
+  padding: 1.2rem;
+  border-top: 1px solid rgb(251, 19, 19);
+  color: var(--muted);
+}
+
+.acciones {
+  white-space: nowrap;
+}
+
+
+@media (max-width: 600px) {
+  .nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .table, .table tbody, .table tr, .table td {
+    display: block;
+    width: 100%;
+  }
+  
+  .table thead {
+    display: none;
+  }
+  
+  .table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #223;
+    border-radius: 0.5rem;
+  }
+  
+  .table td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+  
+  .table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0.75rem;
+    width: 50%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .form-inline {
+    flex-direction: column;
+  }
+  
+  .input, input[type="text"], input[type="number"] {
+    width: 100%;
+  }
+  /* Estilos para los botones de navegación con efecto 3D */
+.nav-button {
+  display: inline-block;
+  padding: 0.6rem 1rem; /* Más relleno para que se vea como botón */
+  border-radius: 0.5rem;
+  background-color: pink; /* Tu color verde definido */
+  color: var(--fg); /* Color de texto blanco/claro */
+  text-decoration: none;
   font-weight: bold;
-  color: green;
+  box-shadow: 0 5px 0 0 darken(var(--ok), 15%); /* Sombra para el efecto 3D */
+  position: relative;
+  top: 0;
+  transition: all 0.15s ease; /* Transición suave para el efecto de "clic" */
+}
+
+.nav-button:hover {
+  filter: brightness(1.1); /* Ligeramente más brillante al pasar el cursor */
+}
+
+.nav-button:active {
+  top: 3px; /* Simula que el botón se "hunde" al hacer clic */
+  box-shadow: 0 2px 0 0 darken(var(--ok), 15%); /* Sombra más pequeña al hacer clic */
+}
+
+/* Ajustes para que los enlaces de la navegación se vean bien */
+.navbar-nav .nav-item {
+    margin-right: 1rem; /* Espacio entre los botones de la nav */
+}
 }

@@ -1,3 +1,4 @@
+// La siguiente línea asegura que el código se ejecute una vez que la página esté completamente cargada.
 document.addEventListener("DOMContentLoaded", () => {
     // --- Lógica para el botón "Cambiar contenido" ---
     const boton = document.getElementById("boton");
@@ -15,24 +16,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- Lógica para la Galería de imágenes ---
+    // --- Lógica para la Galería de imágenes (si la necesitas) ---
     const inputUrl = document.getElementById("imageUrl");
     const addBtn = document.getElementById("addImageBtn");
     const deleteBtn = document.getElementById("deleteImageBtn");
     const gallery = document.getElementById("gallery");
 
-    let selectedImage = null; // Para mantener un registro de la imagen actualmente seleccionada
+    let selectedImage = null; 
 
-    // Comprobar que todos los elementos existen antes de añadir event listeners
     if (inputUrl && addBtn && deleteBtn && gallery) {
-        // Función para deseleccionar todas las imágenes
         function deselectAllImages() {
             document.querySelectorAll(".gallery-image").forEach((el) => {
                 el.classList.remove("selected");
             });
         }
 
-        // Agregar imagen
         addBtn.addEventListener("click", () => {
             const url = inputUrl.value.trim();
             if (url === "") {
@@ -44,64 +42,58 @@ document.addEventListener("DOMContentLoaded", () => {
             img.src = url;
             img.classList.add("gallery-image");
 
-            // Event listener para seleccionar la imagen
             img.addEventListener("click", () => {
                 deselectAllImages(); 
-                img.classList.add("selected"); // Seleccionar esta imagen
-                selectedImage = img; // Actualizar la referencia a la imagen seleccionada
+                img.classList.add("selected");
+                selectedImage = img; 
             });
 
-            gallery.appendChild(img); // Añadir la imagen a la galería
-            inputUrl.value = ""; // Limpiar el input
+            gallery.appendChild(img);
+            inputUrl.value = "";
             selectedImage = null; 
-            
         });
 
-        // Eliminar imagen seleccionada
         deleteBtn.addEventListener("click", () => {
             if (selectedImage) {
                 if (confirm("¿Estás seguro de que quieres eliminar la imagen seleccionada?")) {
-                    selectedImage.remove(); // Eliminar la imagen del DOM
-                    selectedImage = null; // Resetear la referencia de la imagen seleccionada
+                    selectedImage.remove();
+                    selectedImage = null;
                 }
             } else {
                 alert("Por favor, selecciona una imagen para eliminar.");
             }
         });
 
-        // Tecla Enter para agregar imagen en el campo de URL
         inputUrl.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
-                event.preventDefault(); // Evita el envío del formulario si hay uno
-                addBtn.click(); // Simula un clic en el botón de agregar
+                event.preventDefault();
+                addBtn.click();
             }
         });
     } else {
         console.error("Uno o más elementos de la galería no fueron encontrados en el DOM.");
     }
 
-    // --- Lógica para la Lista de Tareas (si existe y quieres activarla) ---
+    // --- Lógica para la Lista de Tareas (si la necesitas) ---
     const taskInput = document.getElementById("taskInput");
     const addTaskBtn = document.getElementById("addTaskBtn");
     const taskList = document.getElementById("taskList");
     const botonRosa = document.getElementById("cambiarColorRosaBtn");
 
-if (botonRosa) {
-    botonRosa.addEventListener("click", () => {
-        document.body.style.backgroundColor = "pink";
-    });
-}
-
+    if (botonRosa) {
+        botonRosa.addEventListener("click", () => {
+            document.body.style.backgroundColor = "pink";
+        });
+    }
 
     if (taskInput && addTaskBtn && taskList) {
         addTaskBtn.addEventListener("click", () => {
             const taskText = taskInput.value.trim();
             if (taskText !== "") {
                 const listItem = document.createElement("li");
-                listItem.classList.add("list-group-item"); // Clase de Bootstrap para ítems de lista
+                listItem.classList.add("list-group-item");
                 listItem.textContent = taskText;
 
-                // Opcional: Agregar un botón para eliminar la tarea
                 const deleteSpan = document.createElement("span");
                 deleteSpan.textContent = " X";
                 deleteSpan.style.cursor = "pointer";
@@ -113,21 +105,17 @@ if (botonRosa) {
                 listItem.appendChild(deleteSpan);
 
                 taskList.appendChild(listItem);
-                taskInput.value = ""; // Limpiar el input
+                taskInput.value = "";
             } else {
                 alert("Por favor, escribe una inquietud.");
             }
-
         });
 
-
-        // Permitir agregar con Enter en el campo de texto
         taskInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
-                event.preventDefault(); // Previene el salto de línea por defecto
+                event.preventDefault();
                 addTaskBtn.click();
             }
-            
         });
     }
 });

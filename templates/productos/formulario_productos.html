@@ -27,7 +27,8 @@
                 <span class="text-danger">{{ error }}</span>
             {% endfor %}
         </div>
-        {{ form.submit(class="btn btn-primary") }}
+        {{ form.submit(class="btn btn-primary", value="Registrar Producto") }}
+        <a href="{{ url_for('lista_productos') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

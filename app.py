@@ -10,7 +10,9 @@ from inventario import (
     insertar_producto, 
     obtener_todos, 
     buscar_por_nombre,
-    eliminar_producto
+    eliminar_producto,
+    obtener_producto_por_id,
+    editar_producto
 )
 from forms import ProductoForm
 
@@ -50,6 +52,28 @@ def lista_productos():
 
     return render_template('productos/lista_productos.html', productos=productos, title='Lista de Productos', q=q)
 
+# La función para editar el producto, ahora con la lógica correcta
+@app.route('/editar_producto/<int:pid>', methods=['GET', 'POST'])
+def editar_producto_route(pid):  # Se renombra para evitar conflicto
+    producto = obtener_producto_por_id(pid)
+    
+    if not producto:
+        flash('Producto no encontrado.', 'danger')
+        return redirect(url_for('lista_productos'))
+
+    form = ProductoForm(obj=producto)
+
+    if form.validate_on_submit():
+        try:
+            editar_producto(pid, form.nombre.data, form.cantidad.data, form.precio.data)
+            flash('Producto actualizado correctamente.', 'success')
+            return redirect(url_for('lista_productos'))
+        except sqlite3.IntegrityError:
+            flash(f'Error: El producto "{form.nombre.data}" ya existe.', 'danger')
+            return redirect(url_for('editar_producto', pid=pid)) # Redirigir a la misma página de edición
+    
+    return render_template('productos/lista_productos.html', form=form, title='Editar Producto')
+
 @app.route('/eliminar_producto/<int:pid>', methods=['POST'])
 def eliminar_producto_route(pid):
     eliminar_producto(pid)
@@ -58,5 +82,5 @@ def eliminar_producto_route(pid):
 
 if __name__ == "__main__":
     with app.app_context():
-        crear_tablas()
+        crear_tablas() 
     app.run(debug=True)

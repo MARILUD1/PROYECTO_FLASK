@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>{{ title }}</h2>
+    <h2>Lista de Productos</h2>
 
     <form method="GET" class="mb-3">
         <div class="input-group">
@@ -10,8 +10,6 @@
             <button class="btn btn-outline-secondary" type="submit">Buscar</button>
         </div>
     </form>
-
-    <a href="{{ url_for('formulario_productos') }}" class="btn btn-success mb-3">+ Nuevo Producto</a>
 
     <table class="table table-striped">
         <thead>
@@ -31,10 +29,10 @@
                 <td>{{ producto.cantidad }}</td>
                 <td>${{ "%.2f"|format(producto.precio) }}</td>
                 <td>
-                    <a href="#" class="btn btn-warning btn-sm">Editar</a>
-                    <form action="{{ url_for('eliminar_producto_route', pid=producto.id_producto) }}" method="POST" style="display:inline-block;">
+                    <a href="{{ url_for('editar_producto_route', pid=producto.id_producto) }}" class="btn btn-warning btn-sm">Editar</a>
+                   <form action="{{ url_for('eliminar_producto_route', pid=producto.id_producto) }}" method="POST" style="display:inline-block;">
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que deseas eliminar este producto?');">Eliminar</button>
-                    </form>
+                   </form>
                 </td>
             </tr>
             {% else %}

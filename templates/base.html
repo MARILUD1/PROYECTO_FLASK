@@ -10,11 +10,11 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Inventario</a>
-            <div class="collapse navbar-collapse">
+            <a class="navbar-brand" href="{{ url_for('index') }}" style="font-size: 2rem; font-weight: bold;">BASE DE DATOS</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('lista_productos') }}">Productos</a>
+                        <a class="nav-link btn btn-primary" href="{{ url_for('lista_productos') }}">Ingresa a la base</a>
                     </li>
                 </ul>
             </div>

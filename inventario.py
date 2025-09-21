@@ -3,16 +3,19 @@ import sqlite3
 DB_NAME = "inventario.db"
 
 class Producto:
-    def __init__(self, id_producto, nombre, cantidad, precio):
+    def __init__(self, id_producto, nombre, cantidad, talla, color, precio, stock):
         self.id_producto = id_producto
         self.nombre = nombre
         self.cantidad = cantidad
+        self.talla = talla
+        self.color = color
         self.precio = precio
+        self.stock = stock
 
 def conectar():
-    """Establece una conexión a la base de datos y configura la fábrica de filas."""
+    """Conexión a la base de datos con filas como diccionarios"""
     conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row  # Asegura que los resultados se devuelvan como diccionarios
+    conn.row_factory = sqlite3.Row
     return conn
 
 def crear_tablas():
@@ -23,41 +26,49 @@ def crear_tablas():
                 id_producto INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT UNIQUE NOT NULL,
                 cantidad INTEGER NOT NULL,
-                precio REAL NOT NULL
+                talla TEXT NOT NULL,
+                color TEXT NOT NULL,
+                precio REAL NOT NULL,
+                stock INTEGER NOT NULL
             )
         """)
         conn.commit()
 
-def insertar_producto(nombre, cantidad, precio):
+def insertar_producto(nombre, cantidad, talla, color, precio, stock):
     with conectar() as conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO productos (nombre, cantidad, precio) VALUES (?, ?, ?)",
-                       (nombre, cantidad, precio))
+        cursor.execute(
+            "INSERT INTO productos (nombre, cantidad, talla, color, precio, stock) VALUES (?, ?, ?, ?, ?, ?)",
+            (nombre, cantidad, talla, color, precio, stock)
+        )
         conn.commit()
-    
-# --- Funciones de edición y obtención ---
+
 def obtener_producto_por_id(id_producto):
     with conectar() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM productos WHERE id_producto=?", (id_producto,))
         row = cursor.fetchone()
         if row:
-            # Los nombres de las columnas coinciden con los atributos del objeto Producto
-            return Producto(row['id_producto'], row['nombre'], row['cantidad'], row['precio'])
+            return Producto(
+                row['id_producto'],
+                row['nombre'],
+                row['cantidad'],
+                row['talla'],
+                row['color'],
+                row['precio'],
+                row['stock']
+            )
         return None
 
-def editar_producto(id_producto, nombre, cantidad, precio):
+def editar_producto(id_producto, nombre, cantidad, talla, color, precio, stock):
     with conectar() as conn:
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE productos
-            SET nombre = ?,
-                cantidad = ?,
-                precio = ?
+            SET nombre = ?, cantidad = ?, talla = ?, color = ?, precio = ?, stock = ?
             WHERE id_producto = ?
-        """, (nombre, cantidad, precio, id_producto))
+        """, (nombre, cantidad, talla, color, precio, stock, id_producto))
         conn.commit()
-# --- Fin de las funciones ---
 
 def eliminar_producto(id_producto):
     with conectar() as conn:
@@ -70,12 +81,33 @@ def obtener_todos():
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM productos")
         rows = cursor.fetchall()
-        # Se asegura que la lista de objetos Producto se crea correctamente
-        return [Producto(row['id_producto'], row['nombre'], row['cantidad'], row['precio']) for row in rows]
+        return [
+            Producto(
+                row['id_producto'],
+                row['nombre'],
+                row['cantidad'],
+                row['talla'],
+                row['color'],
+                row['precio'],
+                row['stock']
+            )
+            for row in rows
+        ]
 
 def buscar_por_nombre(nombre):
     with conectar() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM productos WHERE nombre LIKE ?", ('%' + nombre + '%',))
         rows = cursor.fetchall()
-        return [Producto(row['id_producto'], row['nombre'], row['cantidad'], row['precio']) for row in rows]
+        return [
+            Producto(
+                row['id_producto'],
+                row['nombre'],
+                row['cantidad'],
+                row['talla'],
+                row['color'],
+                row['precio'],
+                row['stock']
+            )
+            for row in rows
+        ]

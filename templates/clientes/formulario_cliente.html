@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+
+    {% if get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in get_flashed_messages() %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+            {{ form.nombre.label(class="form-label") }}
+            {{ form.nombre(class="form-control") }}
+            {% for error in form.nombre.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.apellidos.label(class="form-label") }}
+            {{ form.apellidos(class="form-control") }}
+            {% for error in form.apellidos.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.cedula.label(class="form-label") }}
+            {{ form.cedula(class="form-control") }}
+            {% for error in form.cedula.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.correo.label(class="form-label") }}
+            {{ form.correo(class="form-control") }}
+            {% for error in form.correo.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.telefono.label(class="form-label") }}
+            {{ form.telefono(class="form-control") }}
+            {% for error in form.telefono.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">
+            {{ 'Guardar cambios' if 'editar' in request.path else 'Registrar Cliente' }}
+        </button>
+
+        <a href="{{ url_for('lista_clientes') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

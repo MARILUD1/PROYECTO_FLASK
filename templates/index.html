@@ -2,14 +2,19 @@
 
 {% block content %}
 <div class="jumbotron text-center">
-    <h1 class="display-4">INVENTARIO ALMACEN DE ROPA LA MODA</h1>
+    <h1 class="display-4">INVENTARIO ALMACÉN DE ROPA LA MODA</h1>
     <p class="lead">
-       REGISTO DE PRODUCTOS.
+        REGISTRO DE PRODUCTOS.
     </p>
     <hr class="my-4">
     <p>
-       Esta sección es para ver productos registrados y tambien para ingresar los productos vendidos.
+        Esta sección es para ver productos registrados, clientes y los productos vendidos.
     </p>
-    <a class="btn btn-primary btn-lg" href="{{ url_for('lista_productos') }}" role="button">Siguiente</a>
+    <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('lista_producto') }}" role="button">Productos</a>
+        <a class="btn btn-success btn-lg" href="{{ url_for('lista_clientes') }}" role="button">Clientes</a>
+        <a class="btn btn-warning btn-lg" href="{{ url_for('lista_detalle_ventas') }}" role="button">Detalle de Ventas</a>
+        <a class="btn btn-info btn-lg" href="{{ url_for('lista_facturas') }}" role="button">Facturas</a>
+    </div>
 </div>
 {% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+            {{ form.fecha_factura.label(class="form-label") }}
+            {{ form.fecha_factura(class="form-control") }}
+            {% for error in form.fecha_factura.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.id_cliente.label(class="form-label") }}
+            {{ form.id_cliente(class="form-control") }}
+            {% for error in form.id_cliente.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+        <div class="mb-3">
+            {{ form.id_empleado.label(class="form-label") }}
+            {{ form.id_empleado(class="form-control") }}
+            {% for error in form.id_empleado.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.valor_total.label(class="form-label") }}
+            {{ form.valor_total(class="form-control") }}
+            {% for error in form.valor_total.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+        <div class="mb-3">
+            {{ form.iva.label(class="form-label") }}
+            {{ form.iva(class="form-control") }}
+            {% for error in form.iva.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.id_producto.label(class="form-label") }}
+            {{ form.id_producto(class="form-control") }}
+            {% for error in form.id_producto.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+        <div class="mb-3">
+            {{ form.cantidad.label(class="form-label") }}
+            {{ form.cantidad(class="form-control") }}
+            {% for error in form.cantidad.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">
+            {{ 'Guardar cambios' if 'editar' in request.path else 'Crear Factura' }}
+        </button>
+
+        <a href="{{ url_for('lista_facturas') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

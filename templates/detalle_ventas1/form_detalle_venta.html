@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>{{ title }}</h2>
+        <a href="{{ url_for('lista_detalle_ventas') }}" class="btn btn-secondary">Cancelar</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="list-unstyled">
+                {% for category, message in messages %}
+                    <li class="alert alert-{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+            {{ form.id_cliente.label(class="form-label") }}
+            {{ form.id_cliente(class="form-control") }}
+            {% for error in form.id_cliente.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.id_producto.label(class="form-label") }}
+            {{ form.id_producto(class="form-control") }}
+            {% for error in form.id_producto.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.cantidad.label(class="form-label") }}
+            {{ form.cantidad(class="form-control") }}
+            {% for error in form.cantidad.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        
+        <div class="mb-3">
+            {{ form.despacho.label(class="form-label") }}
+            {{ form.despacho(class="form-control") }}
+            {% for error in form.despacho.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.fidelidad.label(class="form-label") }}
+            {{ form.fidelidad(class="form-control") }}
+            {% for error in form.fidelidad.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.descuento.label(class="form-label") }}
+            {{ form.descuento(class="form-control") }}
+            {% for error in form.descuento.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.precio_unitario.label(class="form-label") }}
+            {{ form.precio_unitario(class="form-control") }}
+            {% for error in form.precio_unitario.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            {{ 'Guardar cambios' if 'editar' in request.path else 'Crear Detalle de Venta' }}
+        </button>
+    </form>
+</div>
+{% endblock %}

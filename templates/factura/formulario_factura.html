@@ -23,13 +23,6 @@
             {% endfor %}
         </div>
         
-        <div class="mb-3">
-            {{ form.id_empleado.label(class="form-label") }}
-            {{ form.id_empleado(class="form-control") }}
-            {% for error in form.id_empleado.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
-        </div>
 
         <div class="mb-3">
             {{ form.valor_total.label(class="form-label") }}

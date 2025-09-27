@@ -2,18 +2,18 @@
 
 {% block content %}
 <div class="container mt-4">
-    <a href="{{ url_for('formulario_producto') }}" class="btn btn-primary mb-3">Aqui regitra el producto vendido</a>
+    <a href="{{ url_for('formulario_producto') }}" class="btn btn-primary mb-3">Aquí registra el producto vendido</a>
 
-
-<div class="input-group">
-<input type="text" class="form-control" name="q" placeholder="Buscar producto..." value="{{ q }}">
-<button class="btn btn-outline-secondary" type="submit">Buscar</button>
-
-</div>
-<h2>Lista de Productos ingresados</h2>
+    <form action="{{ url_for('lista_producto') }}" method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" placeholder="Buscar producto..." value="{{ q }}">
+            <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+        </div>
     </form>
 
-      <table class="table table-striped">
+    <h2>Lista de Productos ingresados</h2>
+
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>ID</th>
@@ -24,11 +24,11 @@
                 <th>Precio</th>
                 <th>Stock</th>
                 <th>Acciones</th>
-                </tr>
+            </tr>
         </thead>
         <tbody>
             {% for producto in producto %}
-          <tr>
+            <tr>
                 <td>{{ producto['id_producto'] }}</td>
                 <td>{{ producto['nombre'] }}</td>
                 <td>{{ producto['cantidad'] }}</td>
@@ -45,10 +45,26 @@
             </tr>
             {% else %}
             <tr>
-               <td colspan="8" class="text-center">producto no registrado.</td>
+                <td colspan="8" class="text-center">No hay productos registrados.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <nav aria-label="Navegación de páginas">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('lista_producto', page=page-1, q=q) }}">Anterior</a>
+            </li>
+            {% for p in range(1, pages + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('lista_producto', page=p, q=q) }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+            <li class="page-item {% if page == pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('lista_producto', page=page+1, q=q) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 {% endblock %}

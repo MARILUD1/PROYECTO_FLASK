@@ -4,8 +4,6 @@ from wtforms import DateField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Length
 
 # -----------------------------
-# Formulario para PRODUCTO
-# -----------------------------
 class ProductoForm(FlaskForm):
     nombre = StringField('Nombre', validators=[DataRequired(), Length(min=2, max=50)])
     cantidad = IntegerField('Cantidad', validators=[DataRequired(), NumberRange(min=0)])
@@ -30,13 +28,16 @@ class ClienteForm(FlaskForm):
 # Formulario para DETALLE_VENTAS1
 # -----------------------------
 class DetalleVentaForm(FlaskForm):
+    # ¡NUEVO CAMPO AQUÍ!
+    id_factura = SelectField('Factura', coerce=int, validators=[DataRequired()])
+    
     id_producto = SelectField('Producto', coerce=int, validators=[DataRequired()])
     id_cliente = SelectField('Cliente', coerce=int, validators=[DataRequired()])
     cantidad = IntegerField('Cantidad', validators=[DataRequired(), NumberRange(min=1)])
     precio_unitario = FloatField('Precio Unitario', validators=[DataRequired(), NumberRange(min=0.01)])
-    descuento = FloatField('Descuento', validators=[NumberRange(min=0)], default=0)
-    despacho = StringField('Despacho')
-    fidelidad = StringField('Fidelidad')
+    descuento = FloatField('Descuento ejemplo 10', validators=[NumberRange(min=0)], default=0)
+    despacho = StringField('Método de Envío')
+    fidelidad = StringField('Fidelidad(puntos ganados)')
     submit = SubmitField('Guardar')
 
 # -----------------------------
@@ -45,7 +46,6 @@ class DetalleVentaForm(FlaskForm):
 class FacturaForm(FlaskForm):
     fecha_factura = DateField('Fecha de la Factura', format='%Y-%m-%d', validators=[DataRequired()])
     id_cliente = SelectField('Cliente', coerce=int, validators=[DataRequired()])
-    id_empleado = SelectField('Empleado', coerce=int, validators=[DataRequired()])
     valor_total = DecimalField('Valor Total', places=2, validators=[DataRequired(), NumberRange(min=0)])
     iva = DecimalField('IVA', places=2, validators=[DataRequired(), NumberRange(min=0)])
     id_producto = SelectField('Producto', coerce=int, validators=[DataRequired()])

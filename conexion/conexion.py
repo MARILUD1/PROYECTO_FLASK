@@ -7,7 +7,7 @@ import sys
 def conexion():
     return mariadb.connect(
         host='localhost',
-        database='almacenropalamoda',
+        database='BasededatosFlask',
         user='Flask',  # luego en producción usa variable de entorno
         password='Lupe1986.' # luego en producción usa variable de entorno
     )

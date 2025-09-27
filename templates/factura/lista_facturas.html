@@ -23,7 +23,6 @@
                 <th>ID</th>
                 <th>Fecha</th>
                 <th>Cliente</th>
-                <th>Empleado</th>
                 <th>Valor Total</th>
                 <th>IVA</th>
                 <th>Acciones</th>
@@ -35,7 +34,6 @@
                 <td>{{ factura['id_factura'] }}</td>
                 <td>{{ factura['fecha_factura'] }}</td>
                 <td>{{ factura['nombre_cliente'] }}</td>
-                <td>{{ factura['nombre_empleado'] }}</td>
                 <td>
                     {% if factura['valor_total'] is not none %}
                         ${{ '%.2f' | format(factura['valor_total']) }}

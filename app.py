@@ -2,6 +2,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 import mariadb
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user 
 from form import ProductoForm, ClienteForm, DetalleVentaForm, FacturaForm
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -26,7 +27,7 @@ def conexion():
         host="localhost",
         user="root",
         password="Lupe1986.",
-        database="almacenropalamoda"
+        database="BasededatosFlask"
     )
 
 def cerrar_conexion(conn):
@@ -177,21 +178,48 @@ def about():
 # ... (El resto de tus rutas para productos, clientes, etc. siguen aquí, sin cambios)
 #
 # Listar / Buscar Productos
+
 @app.route('/producto')
 @login_required
 def lista_producto():
     q = request.args.get('q', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 3  # Número de productos por página
+    offset = (page - 1) * per_page
+    
     conn = conexion()
     cur = conn.cursor(dictionary=True)
     
+    # Obtener el número total de productos para la paginación
     if q:
-        cur.execute("SELECT * FROM producto WHERE nombre LIKE ?", (f"%{q}%",))
+        cur.execute("SELECT COUNT(*) AS total FROM producto WHERE nombre LIKE ?", (f"%{q}%",))
     else:
-        cur.execute("SELECT * FROM producto")
+        cur.execute("SELECT COUNT(*) AS total FROM producto")
+        
+    total = cur.fetchone()['total']
+
+    # Obtener los productos para la página actual
+    if q:
+        cur.execute("SELECT * FROM producto WHERE nombre LIKE ? LIMIT ? OFFSET ?", (f"%{q}%", per_page, offset))
+    else:
+        cur.execute("SELECT * FROM producto LIMIT ? OFFSET ?", (per_page, offset))
     
     productos = cur.fetchall()
+    
+    # Calcular el número total de páginas
+    pages = (total // per_page) + (1 if total % per_page > 0 else 0)
+
     cerrar_conexion(conn)
-    return render_template('producto/lista_producto.html', title='Productos', producto=productos, q=q)
+
+    return render_template(
+        'producto/lista_producto.html',
+        title='Productos',
+        producto=productos,
+        q=q,
+        page=page,
+        pages=pages,
+        total=total
+    )
 
 # Crear Producto
 @app.route('/producto/nuevo', methods=['GET', 'POST'])
@@ -267,27 +295,53 @@ def eliminar_producto(pid):
         cerrar_conexion(conn)
     return redirect(url_for('lista_producto'))
 
-# ----------------------------
 # Rutas de Clientes
-# ----------------------------
+
 @app.route("/clientes")
 @login_required
 def lista_clientes():
     q = request.args.get('q', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 3  # Número de clientes visibles por página
+    offset = (page - 1) * per_page
+
     conn = conexion()
-    cur = conn.cursor()
-    
+    cur = conn.cursor(dictionary=True) # Se usa dictionary=True para facilitar el acceso a los datos
+
+    # 1. Obtener el número total de clientes
     if q:
         cur.execute(
-            "SELECT * FROM clientes WHERE nombre LIKE ? OR apellidos LIKE ? OR cedula LIKE ?",
+            "SELECT COUNT(*) AS total FROM clientes WHERE nombre LIKE ? OR apellidos LIKE ? OR cedula LIKE ?",
             (f"%{q}%", f"%{q}%", f"%{q}%")
         )
     else:
-        cur.execute("SELECT * FROM clientes")
+        cur.execute("SELECT COUNT(*) AS total FROM clientes")
+    
+    total = cur.fetchone()['total']
+
+    # 2. Obtener los clientes para la página actual
+    if q:
+        cur.execute(
+            "SELECT * FROM clientes WHERE nombre LIKE ? OR apellidos LIKE ? OR cedula LIKE ? LIMIT ? OFFSET ?",
+            (f"%{q}%", f"%{q}%", f"%{q}%", per_page, offset)
+        )
+    else:
+        cur.execute("SELECT * FROM clientes LIMIT ? OFFSET ?", (per_page, offset))
         
     clientes = cur.fetchall()
+    
+    # Calcular el número total de páginas
+    pages = (total // per_page) + (1 if total % per_page > 0 else 0)
+
     cerrar_conexion(conn)
-    return render_template("clientes/lista_clientes.html", clientes=clientes, q=q)
+    
+    return render_template(
+        "clientes/lista_clientes.html", 
+        clientes=clientes, 
+        q=q,
+        page=page,
+        pages=pages
+    )
 
 @app.route("/clientes/crear", methods=["GET", "POST"])
 @login_required
@@ -310,7 +364,7 @@ def crear_cliente():
         finally:
             cerrar_conexion(conn)
             
-    return render_template("clientes/formulario_clientes.html", form=form, title="Crear Cliente")
+    return render_template("clientes/formulario_cliente.html", form=form, title="Crear Cliente")
 
 @app.route("/clientes/editar/<int:cid>", methods=["GET", "POST"])
 @login_required
@@ -345,7 +399,7 @@ def editar_cliente(cid):
         finally:
             cerrar_conexion(conn)
     
-    return render_template("clientes/formulario_clientes.html", form=form, title="Editar Cliente", cid=cid)
+    return render_template("clientes/formulario_cliente.html", form=form, title="Editar Cliente", cid=cid)
 
 @app.route("/clientes/eliminar/<int:cid>", methods=["POST"])
 @login_required
@@ -384,27 +438,38 @@ def lista_detalle_ventas():
     cerrar_conexion(conn)
     return render_template("detalle_ventas1/lista_detalle_ventas.html", detalles=detalles)
 
+# app.py
+
 @app.route("/detalle_ventas/crear", methods=["GET", "POST"])
 @login_required
 def crear_detalle_venta():
     form = DetalleVentaForm()
-    conn = conexion()
-    cur = conn.cursor()
-    
-    cur.execute("SELECT id_cliente, nombre, apellidos FROM clientes")
-    clientes = cur.fetchall()
-    form.id_cliente.choices = [(c[0], f"{c[1]} {c[2]}") for c in clientes]
-    
-    cur.execute("SELECT id_producto, nombre FROM producto")
-    productos = cur.fetchall()
-    form.id_producto.choices = [(p[0], p[1]) for p in productos]
-    
-    if form.validate_on_submit():
-        try:
+    conn = None
+    try:
+        conn = conexion()
+        cur = conn.cursor()
+        
+        # Línea 420: Llenar opciones para el campo id_cliente
+        cur.execute("SELECT id_cliente, nombre, apellidos FROM clientes")
+        clientes = cur.fetchall()
+        form.id_cliente.choices = [(c[0], f"{c[1]} {c[2]}") for c in clientes]
+        
+        # Línea 424: Llenar opciones para el campo id_producto
+        cur.execute("SELECT id_producto, nombre FROM producto")
+        productos = cur.fetchall()
+        form.id_producto.choices = [(p[0], p[1]) for p in productos]
+        
+        # NUEVA LÍNEA: Llenar opciones para el campo id_factura
+        cur.execute("SELECT id_factura, fecha_factura FROM factura ORDER BY id_factura DESC")
+        facturas = cur.fetchall()
+        form.id_factura.choices = [(f[0], f"Factura #{f[0]} ({f[1].strftime('%Y-%m-%d')})") for f in facturas]
+        
+        if form.validate_on_submit():
             cur.execute("""
-                INSERT INTO detalle_ventas1 (id_cliente, id_producto, cantidad, despacho, fidelidad, descuento, precio_unitario)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO detalle_ventas1 (id_factura, id_cliente, id_producto, cantidad, despacho, fidelidad, descuento, precio_unitario)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (
+                form.id_factura.data,
                 form.id_cliente.data,
                 form.id_producto.data,
                 form.cantidad.data,
@@ -416,18 +481,24 @@ def crear_detalle_venta():
             conn.commit()
             flash("Detalle de venta creado correctamente", "success")
             return redirect(url_for("lista_detalle_ventas"))
-        except mariadb.Error as e:
+
+    except mariadb.Error as e:
+        if conn:
             conn.rollback()
-            flash(f"Error al crear el detalle de venta: {e}", "danger")
-        finally:
-            cerrar_conexion(conn)
-    
-    cerrar_conexion(conn)
+        flash(f"Error al crear el detalle de venta: {e}", "danger")
+        
+    finally:
+        cerrar_conexion(conn)
+
     return render_template("detalle_ventas1/form_detalle_venta.html", form=form, title="Crear Detalle de Venta")
 
 # ----------------------------
 # Rutas de Facturas
 # ----------------------------
+# app.py
+
+# ... (código anterior)
+
 @app.route("/facturas")
 @login_required
 def lista_facturas():
@@ -439,12 +510,12 @@ def lista_facturas():
                 f.id_factura,
                 f.fecha_factura,
                 c.nombre as nombre_cliente,
-                e.nombre as nombre_empleado,
+                -- Se elimina la referencia a 'e.nombre'
                 f.valor_total,
                 f.iva
             FROM factura f
             JOIN clientes c ON f.id_cliente = c.id_cliente
-            JOIN empleado e ON f.id_empleado = e.id_empleado
+            -- Se elimina la línea JOIN empleado
             ORDER BY f.id_factura DESC
         """)
         facturas = cur.fetchall()
@@ -456,6 +527,7 @@ def lista_facturas():
     
     return render_template("factura/lista_facturas.html", facturas=facturas, title="Lista de Facturas")
 
+# ... (código para crear_factura)
 @app.route("/facturas/crear", methods=["GET", "POST"])
 @login_required
 def crear_factura():
@@ -467,9 +539,6 @@ def crear_factura():
     clientes = cur.fetchall()
     form.id_cliente.choices = [(c[0], f"{c[1]} {c[2]}") for c in clientes]
     
-    cur.execute("SELECT id_empleado, nombre, apellido FROM empleado")
-    empleados = cur.fetchall()
-    form.id_empleado.choices = [(e[0], f"{e[1]} {e[2]}") for e in empleados]
     
     cur.execute("SELECT id_producto, nombre FROM producto")
     productos = cur.fetchall()
@@ -478,12 +547,11 @@ def crear_factura():
     if form.validate_on_submit():
         try:
             cur.execute("""
-                INSERT INTO factura (fecha_factura, id_cliente, id_empleado, valor_total, iva)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO factura (fecha_factura, id_cliente, valor_total, iva)
+                VALUES (?, ?, ?, ?)
             """, (
                 form.fecha_factura.data,
                 form.id_cliente.data,
-                form.id_empleado.data,
                 form.valor_total.data,
                 form.iva.data,
             ))

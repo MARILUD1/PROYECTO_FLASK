@@ -38,14 +38,14 @@
         <tbody>
             {% for cliente in clientes %}
             <tr>
-                <td>{{ cliente[1] }}</td>
-                <td>{{ cliente[2] }}</td>
-                <td>{{ cliente[3] }}</td>
-                <td>{{ cliente[4] }}</td>
-                <td>{{ cliente[5] }}</td>
+                <td>{{ cliente['nombre'] }}</td>
+                <td>{{ cliente['apellidos'] }}</td>
+                <td>{{ cliente['cedula'] }}</td>
+                <td>{{ cliente['correo'] }}</td>
+                <td>{{ cliente['telefono'] }}</td>
                 <td>
-                    <a href="{{ url_for('editar_cliente', cid=cliente[0]) }}" class="btn btn-sm btn-warning">Editar</a>
-                    <form action="{{ url_for('eliminar_cliente', cid=cliente[0]) }}" method="post" style="display:inline;">
+                    <a href="{{ url_for('editar_cliente', cid=cliente['id_cliente']) }}" class="btn btn-sm btn-warning">Editar</a>
+                    <form action="{{ url_for('eliminar_cliente', cid=cliente['id_cliente']) }}" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este cliente?');">Eliminar</button>
                     </form>
                 </td>
@@ -57,6 +57,22 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <nav aria-label="Navegación de páginas">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('lista_clientes', page=page-1, q=q) }}">Anterior</a>
+            </li>
+            {% for p in range(1, pages + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('lista_clientes', page=p, q=q) }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+            <li class="page-item {% if page == pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('lista_clientes', page=page+1, q=q) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
     
-    </div>
+</div>
 {% endblock %}

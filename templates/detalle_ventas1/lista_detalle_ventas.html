@@ -2,6 +2,14 @@
 
 {% block content %}
 <div class="container mt-4">
+
+    <form action="{{ url_for('lista_detalle_ventas') }}" method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" placeholder="Buscar detalle de venta..." value="{{ q if q is defined else '' }}">
+            <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+        </div>
+    </form>
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Detalle de Ventas</h2>
         <a href="{{ url_for('crear_detalle_venta') }}" class="btn btn-primary">Agregar Detalle</a>
@@ -32,16 +40,16 @@
         <tbody>
             {% for detalle in detalles %}
             <tr>
-                <td>{{ detalle[0] }}</td>
-                <td>{{ detalle[1] }} {{ detalle[2] }}</td>
-                <td>{{ detalle[3] }}</td>
-                <td>{{ detalle[4] }}</td>
-                <td>{{ detalle[5] }}</td>
-                <td>{{ detalle[6] }}</td>
+                <td>{{ detalle['id_detalle'] }}</td>
+                <td>{{ detalle['nombre_cliente'] }} {{ detalle['apellido_cliente'] }}</td> 
+                <td>{{ detalle['nombre_producto'] }}</td>
+                <td>{{ detalle['cantidad'] }}</td>
+                <td>{{ detalle['descuento'] }}</td>
+                <td>{{ detalle['precio_unitario'] }}</td>
                 <td>
-                    <a href="{{ url_for('editar_detalle_venta', did=detalle[0]) }}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{{ url_for('editar_detalle_venta', did=detalle['id_detalle']) }}" class="btn btn-sm btn-warning">Editar</a>
                     
-                    <form action="{{ url_for('eliminar_detalle_venta', did=detalle[0]) }}" method="post" style="display:inline;">
+                    <form action="{{ url_for('eliminar_detalle_venta', did=detalle['id_detalle']) }}" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este detalle?');">Eliminar</button>
                     </form>
                 </td>
@@ -53,5 +61,21 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <nav aria-label="Navegación de páginas">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('lista_detalle_ventas', page=page-1, q=q) }}">Anterior</a>
+            </li>
+            {% for p in range(1, pages + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('lista_detalle_ventas', page=p, q=q) }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+            <li class="page-item {% if page == pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('lista_detalle_ventas', page=page+1, q=q) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 {% endblock %}

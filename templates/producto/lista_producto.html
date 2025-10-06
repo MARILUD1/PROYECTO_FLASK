@@ -2,17 +2,22 @@
 
 {% block content %}
 <div class="container mt-4">
+    
     <a href="{{ url_for('formulario_producto') }}" class="btn btn-primary mb-3">Aquí registra el producto vendido</a>
 
     <form action="{{ url_for('lista_producto') }}" method="get" class="mb-3">
         <div class="input-group">
-            <input type="text" class="form-control" name="q" placeholder="Buscar producto..." value="{{ q }}">
+            <input type="text" class="form-control" name="q" placeholder="Buscar producto..." value="{{ q if q is defined else '' }}">
             <button class="btn btn-outline-secondary" type="submit">Buscar</button>
         </div>
     </form>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalle de Ventas</h2>
+        <a href="{{ url_for('crear_detalle_venta') }}" class="btn btn-primary">Agregar Detalle</a>
+    </div>
 
-    <h2>Lista de Productos ingresados</h2>
-
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>

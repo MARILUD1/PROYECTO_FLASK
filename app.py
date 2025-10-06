@@ -34,7 +34,7 @@ def cerrar_conexion(conn):
     if conn:
         conn.close()
 
-# ----------------------------
+
 # Clase Usuario para Flask-Login
 # ----------------------------
 class Usuario(UserMixin):
@@ -174,9 +174,6 @@ def about():
 
 # ----------------------------
 # Rutas de Productos
-# ----------------------------
-# ... (El resto de tus rutas para productos, clientes, etc. siguen aquí, sin cambios)
-#
 # Listar / Buscar Productos
 
 @app.route('/producto')
@@ -420,25 +417,87 @@ def eliminar_cliente(cid):
         cerrar_conexion(conn)
     return redirect(url_for("lista_clientes"))
 
-# ----------------------------
 # Rutas de Detalle de Ventas
-# ----------------------------
+
 @app.route("/detalle_ventas")
 @login_required
 def lista_detalle_ventas():
-    conn = conexion()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT dv.id_detalle, c.nombre, c.apellidos, p.nombre, dv.cantidad, dv.descuento, dv.precio_unitario
-        FROM detalle_ventas1 dv
-        JOIN clientes c ON dv.id_cliente = c.id_cliente
-        JOIN producto p ON dv.id_producto = p.id_producto
-    """)
-    detalles = cur.fetchall()
-    cerrar_conexion(conn)
-    return render_template("detalle_ventas1/lista_detalle_ventas.html", detalles=detalles)
+    # Parámetros de paginación y búsqueda
+    q = request.args.get('q', '').strip()
+    page = request.args.get('page', 1, type=int)
+    # Usamos 3 como en tu ejemplo de lista_producto
+    per_page = 3  
+    offset = (page - 1) * per_page
+    
+    conn = None
+    detalles = []
+    total = 0
+    pages = 1
+    
+    try:
+        conn = conexion()
+        # Nota: Usaremos cursor(dictionary=True) para obtener resultados con nombres de columna
+        cur = conn.cursor(dictionary=True) 
+        
+        # 1. Configurar la cláusula WHERE y parámetros para búsqueda
+        where_clause = ""
+        params = []
+        if q:
+            # Filtra por nombre/apellido del cliente o nombre del producto (asumiendo la misma lógica)
+            where_clause = """
+                WHERE c.nombre LIKE ? OR c.apellidos LIKE ? OR p.nombre LIKE ?
+            """
+            search_term = f"%{q}%"
+            params = [search_term, search_term, search_term]
+        
+        # 2. Obtener el TOTAL de registros (para la paginación)
+        cur.execute(f"""
+            SELECT COUNT(dv.id_detalle) AS total FROM detalle_ventas1 dv
+            JOIN clientes c ON dv.id_cliente = c.id_cliente
+            JOIN producto p ON dv.id_producto = p.id_producto
+            {where_clause}
+        """, params)
+        total = cur.fetchone()['total']
+        
+        # 3. Obtener los detalles de venta PAGINADOS
+        # Los parámetros de paginación (LIMIT/OFFSET) se añaden al final de la lista de parámetros
+        params_paged = params + [per_page, offset]
+        
+        cur.execute(f"""
+            SELECT dv.id_detalle, c.nombre AS nombre_cliente, c.apellidos AS apellido_cliente, 
+                   p.nombre AS nombre_producto, dv.cantidad, dv.descuento, dv.precio_unitario
+            FROM detalle_ventas1 dv
+            JOIN clientes c ON dv.id_cliente = c.id_cliente
+            JOIN producto p ON dv.id_producto = p.id_producto
+            {where_clause}
+            ORDER BY dv.id_detalle DESC
+            LIMIT ? OFFSET ?
+        """, params_paged)
+        detalles = cur.fetchall()
+        
+        # 4. Calcular el número total de páginas
+        pages = (total // per_page) + (1 if total % per_page > 0 else 0)
+        
+    except Exception as e:
+        flash(f"Error al cargar la lista de detalles de venta: {e}", "danger")
+        
+    finally:
+        if conn:
+            cerrar_conexion(conn)
+    
+    return render_template(
+        "detalle_ventas1/lista_detalle_ventas.html", 
+        title="Detalle de Ventas",
+        detalles=detalles,
+        q=q,
+        page=page,
+        pages=pages,
+        total=total
+    )
 
-# app.py
+#================================================
+# CREAR DETALLE DE VENTA
+#================================================
 
 @app.route("/detalle_ventas/crear", methods=["GET", "POST"])
 @login_required
@@ -449,55 +508,152 @@ def crear_detalle_venta():
         conn = conexion()
         cur = conn.cursor()
         
-        # Línea 420: Llenar opciones para el campo id_cliente
+        # Llenar opciones para los SelectFields
         cur.execute("SELECT id_cliente, nombre, apellidos FROM clientes")
         clientes = cur.fetchall()
         form.id_cliente.choices = [(c[0], f"{c[1]} {c[2]}") for c in clientes]
         
-        # Línea 424: Llenar opciones para el campo id_producto
         cur.execute("SELECT id_producto, nombre FROM producto")
         productos = cur.fetchall()
         form.id_producto.choices = [(p[0], p[1]) for p in productos]
         
-        # NUEVA LÍNEA: Llenar opciones para el campo id_factura
         cur.execute("SELECT id_factura, fecha_factura FROM factura ORDER BY id_factura DESC")
         facturas = cur.fetchall()
-        form.id_factura.choices = [(f[0], f"Factura #{f[0]} ({f[1].strftime('%Y-%m-%d')})") for f in facturas]
+        # Nota: Se añade manejo de error si fecha_factura es NULL o no tiene strftime
+        form.id_factura.choices = [(f[0], f"Factura #{f[0]} ({f[1].strftime('%Y-%m-%d') if f[1] else 'Sin fecha'})") for f in facturas]
+        
         
         if form.validate_on_submit():
             cur.execute("""
-                INSERT INTO detalle_ventas1 (id_factura, id_cliente, id_producto, cantidad, despacho, fidelidad, descuento, precio_unitario)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO detalle_ventas1 (id_factura, id_cliente, id_producto, cantidad, descuento, precio_unitario)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (
                 form.id_factura.data,
                 form.id_cliente.data,
                 form.id_producto.data,
-                form.cantidad.data,
-                form.despacho.data,
-                form.fidelidad.data,
+                form.cantidad.data, 
                 form.descuento.data,
                 form.precio_unitario.data
             ))
-            conn.commit()
+            
+            conn.commit() 
             flash("Detalle de venta creado correctamente", "success")
             return redirect(url_for("lista_detalle_ventas"))
 
-    except mariadb.Error as e:
+    except Exception as e:
         if conn:
             conn.rollback()
         flash(f"Error al crear el detalle de venta: {e}", "danger")
         
     finally:
-        cerrar_conexion(conn)
+        if conn:
+            cerrar_conexion(conn)
 
     return render_template("detalle_ventas1/form_detalle_venta.html", form=form, title="Crear Detalle de Venta")
+
+#================================================
+# EDITAR DETALLE DE VENTA
+#================================================
+
+@app.route('/detalle_ventas/<int:did>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_detalle_venta(did):
+    conn = None
+    try:
+        conn = conexion()
+        cur = conn.cursor(dictionary=True)
+        
+        # 1. Cargar detalle existente
+        cur.execute("SELECT * FROM detalle_ventas1 WHERE id_detalle = ?", (did,))
+        detalle = cur.fetchone()
+        
+        if not detalle:
+            flash("Detalle de venta no encontrado.", "danger")
+            return redirect(url_for("lista_detalle_ventas"))
+
+        # 2. Inicializar formulario con datos actuales y cargar opciones
+        form = DetalleVentaForm(data=detalle)
+        
+        # Llenar opciones de SelectFields (igual que en 'crear')
+        cur.execute("SELECT id_cliente, nombre, apellidos FROM clientes")
+        form.id_cliente.choices = [(c[0], f"{c[1]} {c[2]}") for c in cur.fetchall()]
+        
+        cur.execute("SELECT id_producto, nombre FROM producto")
+        form.id_producto.choices = [(p[0], p[1]) for p in cur.fetchall()]
+        
+        cur.execute("SELECT id_factura, fecha_factura FROM factura ORDER BY id_factura DESC")
+        facturas = cur.fetchall()
+        form.id_factura.choices = [(f[0], f"Factura #{f[0]} ({f[1].strftime('%Y-%m-%d') if f[1] else 'Sin fecha'})") for f in facturas]
+
+
+        if form.validate_on_submit():
+            # 3. Actualizar datos
+            cur.execute(
+                """
+                UPDATE detalle_ventas1 SET id_factura=?, id_cliente=?, id_producto=?, cantidad=?, 
+                                          despacho=?, fidelidad=?, descuento=?, precio_unitario=? 
+                WHERE id_detalle=?
+                """,
+                (form.id_factura.data, form.id_cliente.data, form.id_producto.data, form.cantidad.data, 
+                 form.despacho.data, form.fidelidad.data, form.descuento.data, form.precio_unitario.data, did)
+            )
+            conn.commit()
+            flash('Detalle de venta actualizado correctamente.', 'success')
+            return redirect(url_for('lista_detalle_ventas'))
+        
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f'Error al actualizar el detalle: {str(e)}', 'danger')
+        
+    finally:
+        if conn:
+            cerrar_conexion(conn)
+
+    return render_template('detalle_ventas1/form_detalle_venta.html', title='Editar Detalle de Venta', form=form, did=did)
+
+#================================================
+# ELIMINAR DETALLE DE VENTA
+#================================================
+
+@app.route('/detalle_ventas/<int:did>/eliminar', methods=['POST'])
+@login_required
+def eliminar_detalle_venta(did):
+    conn = None
+    try:
+        conn = conexion()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM detalle_ventas1 WHERE id_detalle = ?", (did,))
+        
+        if cur.rowcount > 0:
+            conn.commit()
+            flash('Detalle de venta eliminado correctamente.', 'success')
+        else:
+            flash('Detalle de venta no encontrado.', 'warning')
+            
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f"Error al eliminar el detalle de venta: {e}", "danger")
+        
+    finally:
+        if conn:
+            cerrar_conexion(conn)
+            
+    return redirect(url_for('lista_detalle_ventas'))
+
+
+
+
+
+
+
 
 # ----------------------------
 # Rutas de Facturas
 # ----------------------------
 # app.py
 
-# ... (código anterior)
 
 @app.route("/facturas")
 @login_required
